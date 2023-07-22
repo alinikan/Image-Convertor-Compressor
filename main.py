@@ -67,6 +67,7 @@ class ImageConverter:
             print(f"An error occurred during conversion: {str(e)}")
 
     def run(self):
+        os.system('cls' if os.name == 'nt' else 'clear')  # clear the terminal
         while True:
             image_path = self.select_image()
             if image_path is None or not self.validate_image(image_path):
