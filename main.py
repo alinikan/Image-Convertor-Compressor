@@ -2,13 +2,14 @@ import tkinter as tk
 from tkinter import filedialog
 from PIL import Image
 import os
+import pyheif
 
 
 class ImageConverter:
     def __init__(self):
         self.root = tk.Tk()
         self.root.withdraw()
-        self.valid_image_extensions = ['.jpg', '.jpeg', '.png', '.bmp', '.tiff']
+        self.valid_image_extensions = ['.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.heic']
         self.formats = {
             '1': 'JPEG',
             '2': 'PNG',
@@ -47,8 +48,20 @@ class ImageConverter:
             return
         output_path = f"{os.path.splitext(image_path)[0]}_converted.{self.formats[user_input].lower()}"
         try:
-            img = Image.open(image_path)
-            img.save(output_path, self.formats[user_input])
+            _, extension = os.path.splitext(image_path)
+            if extension.lower() == '.heic':
+                heif_file = pyheif.read(image_path)
+                image = Image.frombytes(
+                    heif_file.mode,
+                    heif_file.size,
+                    heif_file.data,
+                    "raw",
+                    heif_file.mode,
+                    heif_file.stride,
+                )
+            else:
+                image = Image.open(image_path)
+            image.save(output_path, self.formats[user_input])
             print(f"Image converted successfully. Saved as {output_path}.")
         except Exception as e:
             print(f"An error occurred during conversion: {str(e)}")
